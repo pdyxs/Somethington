@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-public class ScriptableConfig<T> : ScriptableObject where T : ScriptableConfig<T>
+public abstract class ScriptableConfig<T> : ScriptableObject where T : ScriptableConfig<T>
 {
     private static T _config;
     public static T Get()
@@ -21,7 +21,29 @@ public class ScriptableConfig<T> : ScriptableObject where T : ScriptableConfig<T
 
     private static string AssetName {
         get {
-            return "Config-" + typeof(T).Name;
+            System.Reflection.MemberInfo info = typeof(T);
+            var attrs = info.GetCustomAttributes(typeof(SaveLocation), false);
+            if (attrs.Length > 0) {
+                return (attrs[0] as SaveLocation).Name;
+            }
+            return typeof(T).Name + " Configuration";
+        }
+    }
+
+    private static string AssetFolder
+    {
+        get
+        {
+            System.Reflection.MemberInfo info = typeof(T);
+            var attrs = info.GetCustomAttributes(typeof(SaveLocation), false);
+            if (attrs.Length > 0)
+            {
+                var ret = (attrs[0] as SaveLocation).Folder;
+                if (ret.Length > 0) {
+                    return ret;
+                }
+            }
+            return "Assets/Resources";
         }
     }
 
@@ -32,17 +54,51 @@ public class ScriptableConfig<T> : ScriptableObject where T : ScriptableConfig<T
         if (config == null)
         {
             config = ScriptableObject.CreateInstance<T>();
-            if (!AssetDatabase.IsValidFolder("Assets/Resources"))
-            {
-                AssetDatabase.CreateFolder("Assets", "Resources");
-            }
-            AssetDatabase.CreateAsset(config, "Assets/Resources/" + AssetName + ".asset");
+            CheckAndCreateFolder(AssetFolder);
+            AssetDatabase.CreateAsset(config, AssetFolder + "/" + AssetName + ".asset");
             AssetDatabase.SaveAssets();
         }
 
-        EditorUtility.FocusProjectWindow();
         Selection.activeObject = config;
+        EditorUtility.FocusProjectWindow();
+    }
+
+    private static void CheckAndCreateFolder(string folder) {
+        var path = folder.Split('/');
+        string currentPath = "";
+        foreach (string p in path) {
+            if (p.Length == 0) {
+                continue;
+            }
+            Debug.Log(currentPath);
+            Debug.Log(p);
+            string newPath = ((currentPath.Length > 0) ? currentPath + "/" : "") + p;
+            if (!AssetDatabase.IsValidFolder(newPath))
+            {
+                AssetDatabase.CreateFolder(currentPath, p);
+            }
+            currentPath = newPath;
+        }
     }
 #endif
 
+}
+
+[System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = false)]
+public class SaveLocation : System.Attribute {
+    public string Name {
+        get; private set;
+    }
+    public string Folder {
+        get; private set;
+    }
+
+    public SaveLocation(string name) {
+        Name = name;
+    }
+    public SaveLocation(string folder, string name)
+    {
+        Name = name;
+        Folder = folder;
+    }
 }
