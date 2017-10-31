@@ -1,0 +1,9 @@
+{
+  "name": "Somethington",
+  "version": "0.0.1",
+  "description": "Singletons and similar for Unity",
+  "author": "Paul Sztajer",
+  "license": "UNLICENSED",
+  "dependencies": {
+  }
+}
