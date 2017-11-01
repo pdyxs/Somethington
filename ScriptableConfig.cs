@@ -70,8 +70,6 @@ public abstract class ScriptableConfig<T> : ScriptableObject where T : Scriptabl
             if (p.Length == 0) {
                 continue;
             }
-            Debug.Log(currentPath);
-            Debug.Log(p);
             string newPath = ((currentPath.Length > 0) ? currentPath + "/" : "") + p;
             if (!AssetDatabase.IsValidFolder(newPath))
             {
