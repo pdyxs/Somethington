@@ -12,11 +12,18 @@ public abstract class ScriptableConfig<T> : ScriptableObject where T : Scriptabl
     {
 #if !UNITY_EDITOR
         if (_config == null) 
+#else
+        if (!Application.isPlaying || _config == null)
 #endif
         {
             _config = Resources.Load(AssetName) as T;
+            _config.Initialise();
         }
         return _config;
+    }
+
+    protected virtual void Initialise() {
+        
     }
 
     private static string AssetName {
