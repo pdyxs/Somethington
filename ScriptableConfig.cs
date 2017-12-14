@@ -17,7 +17,9 @@ public abstract class ScriptableConfig<T> : ScriptableObject where T : Scriptabl
 #endif
         {
             _config = Resources.Load(AssetName) as T;
-            _config.Initialise();
+            if (_config != null) {
+                _config.Initialise();
+            }
         }
         return _config;
     }
