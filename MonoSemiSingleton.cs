@@ -9,7 +9,7 @@ public abstract class MonoSemiSingleton<T> : MonoBehaviour where T : MonoSemiSin
     }
 
 	// Use this for initialization
-	protected virtual void Start () {
+	protected virtual void Awake () {
         if (instance != null) {
             Debug.LogWarning("There's already a " + typeof(T).Name + ". Destroying it now.");
             instance.DestroyThis();
@@ -24,5 +24,11 @@ public abstract class MonoSemiSingleton<T> : MonoBehaviour where T : MonoSemiSin
     protected virtual void OnDestroy()
     {
         instance = null;
+    }
+
+    public static bool isInitialized {
+        get {
+            return instance != null;
+        }
     }
 }
