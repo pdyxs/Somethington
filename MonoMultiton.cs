@@ -12,9 +12,9 @@ public class MonoMultiton<T> : MonoBehaviour where T : MonoMultiton<T> {
         }
     }
 
-    public static T[] instances {
+    public static TempList<T> instances {
         get {
-            return m_instances.ToArray();
+            return TempList<T>.Get(m_instances);
         }
     }
 
